@@ -13,7 +13,9 @@ dotenv.config();
 import './models/User';
 import './models/Employee';
 import './services/passport';
-import './seed/seed';
+
+// Seed Data
+// import './seed/seed';
 
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/myapp') // provide a default value for MONGO_URI
 .then(() => console.log('MongoDB connected...'))

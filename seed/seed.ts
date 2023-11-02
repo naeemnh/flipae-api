@@ -1,4 +1,4 @@
-import seedData from './data.json';
+import seedData from './inputData.json';
 import Employee from '../models/Employee';
 import { createEmployee, findAllEmployees } from '../database/employee';
 
@@ -14,7 +14,7 @@ async function execSeed() {
 
     for (const [employee, supervisor] of Object.entries(seedData)) {
       try {
-        await createEmployee(employee, supervisor);
+        await createEmployee(employee, supervisor as string);
       } catch (err) {
         console.log(err);
       }
