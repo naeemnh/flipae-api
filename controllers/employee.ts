@@ -73,21 +73,24 @@ async function deleteEmployee (req: Request, res: Response) {
 async function updateEmployee (req: Request, res: Response) {
   try {
     const { employeeName } = req.params;
-    const { supervisorName } = req.body;
+    const { newSupervisor: supervisorName } = req.body;
     const {employee, error} = await updateEmployeeSupervisor(employeeName, supervisorName);
     
     if (error) {
+      console.log('employee not updated')
       return res.status(400).json({
         employee: null,
         error,
       })
     }
-
+    
+    console.log('employee updated')
     return res.status(200).json({
       employee: { ...employee! },
       errorCode: null,
     })
   } catch (err) {
+    console.log('employee not updated')
     return res.status(500).json({
       employee: null,
       error: err,

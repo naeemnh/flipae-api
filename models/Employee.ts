@@ -1,13 +1,14 @@
 import mongoose, { Model, Schema } from 'mongoose';
 
 export interface IEmployee {
+
   name: string;
   supervisor?: IEmployee
 }
 
 
 
-const employeeSchema = new Schema({
+const employeeSchema = new Schema<any, IEmployee>({
   name: {
     type: String,
     required: true,

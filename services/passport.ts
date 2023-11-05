@@ -1,46 +1,28 @@
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
-import bcrypt from 'bcryptjs';
+import { ExtractJwt, Strategy as JWTStrategy, StrategyOptions } from 'passport-jwt';
 
 import User from '../models/User';
 
-passport.serializeUser((user: any, done) => {
-  done(null, user._id);
-});
+passport.serializeUser(User.serializeUser());
 
-passport.deserializeUser((id, done) => {
-  User.findById(id).then((user: any) => {
-    console.log(user);
-    done(null, user);
-  }).catch((err: Error) => {
-    done(err, null);
-  })
-});
+passport.deserializeUser(User.deserializeUser());
+
+const params: StrategyOptions = {
+  secretOrKey: process.env.COOKIE_KEY,
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+}
 
 
-passport.use(new LocalStrategy(
-  {
-    usernameField: 'username',
-    passwordField: 'password',
-  },
-  async (username: string, password: string, done) => {
-    console.log(username, password);
-    // Match user
-    User.findOne({ username: username }).then((user: any) => {
-      if (!user) {
-        return done(null, false, { message: 'Incorrect Username' });
-      }
+passport.use(new JWTStrategy(params, function(payload, done) {
 
-      // Match password
-      bcrypt.compare(password, user.password, (err: Error | null, isMatch: boolean) => {
-        if (err) throw err;
+  if(payload.expire <= Date.now())
+    return done(new Error("TokenExpired"), false);
 
-        if (isMatch) {
-          return done(null, user);
-        } else {
-          return done(null, false, { message: 'Password incorrect' });
-        }
-      });
-    });
-  }
-));
+  User.findById(payload.id)
+    .then(user =>  user ? done(null, user) : done(new Error("UserNotFound"), false))
+    .catch(err => done(err, false))
+}))
+
+passport.use(new LocalStrategy(User.authenticate()));
+

@@ -10,7 +10,7 @@ router.post('/register', users.register);
 router.post('/login', passport.authenticate('local'), users.login);
 
 router.route('/')
-  .get(users.currentUser)
+  .get(passport.authenticate('jwt',  {session: false}), users.currentUser)
   .delete(users.logout);
 
 

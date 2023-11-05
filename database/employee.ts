@@ -8,7 +8,7 @@ import Employee, { IEmployee } from "../models/Employee";
 export async function findEmployeeByName(name: string) {
   console.log('searching for employee')
   try {
-    const employee = await Employee.findOne({ name })
+    const employee = await Employee.findOne({ name }).populate('supervisor');
     console.log(employee)
     return employee;
   } catch (err) {
@@ -30,15 +30,8 @@ export async function getEmployeeTree(): Promise<Record<string, Record<string, a
       const supervisorName = name;
       employeeTree[supervisorName] = buildSubEmpTree(employees, {name: supervisorName});
     }
-    // } else {
-    //   // Find the supervisor's parent node
-    //   const supervisorName = employees.find(e => e._id.toString() === supervisor._id.toString())!.name
-    //   const parent = employeeTree[supervisorName];
-    //   if (parent) {
-    //     // Create an empty array for the current employee
-    //     parent.push({ [name]: [] });
-    //   }
   });
+  console.log(employeeTree)
   return employeeTree;
 }
 
@@ -73,8 +66,8 @@ export async function findEmployeeAndSupervisor(employeeName: string, supervisor
   const employee = await findEmployeeByName(employeeName);
   const supervisor = await findEmployeeByName(supervisorName);
   let error = 0;
-  error = employee ? error + 10 : error;
-  error = supervisor ? error + 1 : error;
+  error = !employee ? error + 10 : error;
+  error = !supervisor ? error + 1 : error;
   return { employee, supervisor, error: `ES${error}`};
 }
 
@@ -156,8 +149,8 @@ export async function updateEmployeeSupervisor(employeeName: string, supervisorN
   try {
     const { employee, supervisor, error } = await findEmployeeAndSupervisor(employeeName, supervisorName);
     const errorString: {[key: string]: string} = {
-      'ES1': `Employee ${employeeName} exists, but Supervisor ${supervisorName} does not exist`,
-      'ES10': `Employee ${employeeName} does not exist, but Supervisor ${supervisorName} exists`,
+      'ES1': `Supervisor ${supervisorName} exists, but Employee ${employeeName} does not exist`,
+      'ES10': `Employee ${employeeName} exists, but Supervisor ${supervisorName} does not exist`,
       'ES11': `Employee ${employeeName} and Supervisor ${supervisorName} do not exist`,
     }
 
@@ -168,6 +161,12 @@ export async function updateEmployeeSupervisor(employeeName: string, supervisorN
         error: errorString[error],
       }
     }
+    
+    if (supervisor!.supervisor?.name === employee!.name) {
+      supervisor!.supervisor = employee!.supervisor;
+      await supervisor!.save();
+    }
+
     employee!.supervisor = supervisor!._id;
     await employee!.save();
 
@@ -176,6 +175,7 @@ export async function updateEmployeeSupervisor(employeeName: string, supervisorN
       error: null,
     }
   } catch (err) {
+    console.log('Error updating employee:', err)
     return {
       employee: null,
       error: err,
