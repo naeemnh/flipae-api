@@ -8,10 +8,13 @@ passport.serializeUser((user: any, done) => {
   done(null, user._id);
 });
 
-passport.serializeUser((id, done) => {
-  User.findById(id, (err: Error, user: any) => {
-    done(err, user);
-  });
+passport.deserializeUser((id, done) => {
+  User.findById(id).then((user: any) => {
+    console.log(user);
+    done(null, user);
+  }).catch((err: Error) => {
+    done(err, null);
+  })
 });
 
 
@@ -21,10 +24,11 @@ passport.use(new LocalStrategy(
     passwordField: 'password',
   },
   async (username: string, password: string, done) => {
+    console.log(username, password);
     // Match user
     User.findOne({ username: username }).then((user: any) => {
       if (!user) {
-        return done(null, false, { message: 'That email is not registered' });
+        return done(null, false, { message: 'Incorrect Username' });
       }
 
       // Match password

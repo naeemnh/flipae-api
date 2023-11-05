@@ -7,8 +7,9 @@ export async function createUser(username: string, password: string) {
     const encryptedPassword = bcrypt.hashSync(password, 10);
     user.password = encryptedPassword;
     await user.save();
-    return {...user }
+    return {user: {...user}, error: null }
   } catch(err) {
-    throw err;
+    console.log(err, 'in database')
+    return { user: null, error: err }
   }
 }

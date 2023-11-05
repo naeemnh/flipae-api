@@ -1,25 +1,41 @@
 import {Request, Response} from 'express';
-import User from '../models/User';
 import { createUser } from '../database/user';
 
-export default {
-  register: async (req: Request, res: Response) => {
-    try {
-      const { username, password } = req.body;
-      const {username: registeredUser} = await createUser(username, password)
-      req.login(registeredUser, err => {
-        if (err) return res.status(500).json(err);
-        return res.status(201).json(registeredUser);
-      })
-    } catch (err) {
-      return res.status(500).json(err);
+export async function register(req: Request, res: Response) {
+  try {
+    const { username, password } = req.body;
+    const {user: registeredUser, error} = await createUser(username, password);
+    if (error) {
+      console.log(error);
+      return res.status(500).json({user: null, error});
     }
-  },
-  login: async (req: Request, res: Response) => {
-    return res.status(200).json(req.user);
-  },
-  logout: (req: Request, res: Response) => {
-    req.logout({}, () => {});
-    return res.status(200).json(req.user);
+    req.login({username: registeredUser!.username}, err => {
+      if (err) return res.status(500).json({user: null, error: err});
+      return res.status(201).json({user: registeredUser, error: err});
+    })
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({user: null, error: err});
   }
+}
+
+export function login(req: Request, res: Response) {
+  console.log(req.user);
+  return res.status(200).json({user: req.user});
+}
+
+export function logout(req: Request, res: Response) {
+  req.logout({}, () => {});
+  return res.status(200).json(req.user);
+}
+
+export function currentUser(req: Request, res: Response) {
+  return res.status(200).json(req.user);
+}
+
+export default {
+  register,
+  login,
+  logout,
+  currentUser,
 }

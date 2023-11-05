@@ -1,6 +1,6 @@
 import seedData from './inputData.json';
 import Employee from '../models/Employee';
-import { createEmployee, findAllEmployees } from '../database/employee';
+import { createEmployeeWithoutError, getEmployeeTree } from '../database/employee';
 
 // console.log(seedData);
 // seedData.forEach(async ([name, supervisor]) => {
@@ -8,24 +8,28 @@ import { createEmployee, findAllEmployees } from '../database/employee';
 // });
 async function execSeed() {
   try {
-
-    let employees = await Employee.find();
-    await Employee.deleteMany({}).then(() => console.log('Deleted all employees'));
-
+    deleteAllEmployees();
     for (const [employee, supervisor] of Object.entries(seedData)) {
       try {
-        await createEmployee(employee, supervisor as string);
+        await createEmployeeWithoutError(employee, supervisor as string);
       } catch (err) {
         console.log(err);
       }
     }
 
-    const employeeTree = await findAllEmployees();
+    const employeeTree = await getEmployeeTree();
     console.log(employeeTree);
   } catch (err) {
     console.log('Error seeding data: ', err);
   }
+}
 
+function deleteAllEmployees() {
+  try {
+    Employee.deleteMany({}).then(() => console.log('Deleted all employees'));
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 execSeed();
