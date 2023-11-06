@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { createEmployee, createEmployeeWithoutError, deleteEmployeeByName, findEmployeeAndSupervisor, getEmployeeTree, listEmployees, updateEmployeeSupervisor } from "../database/employee";
+import { createEmployee, createEmployeeWithoutError, deleteEmployeeByName, getEmployeeTree, listEmployees, updateEmployeeSupervisor } from "../database/employee";
 
 /**
  * JSON Employee Supervisor Controller
@@ -12,6 +12,7 @@ async function setJsonEmployeeSupervisor(req: Request, res: Response) {
     for (const [employee, supervisor] of Object.entries(employees)) {
       await createEmployeeWithoutError(employee, supervisor as string);
     }
+    return res.status(200).json({message: 'Employees and Supervisors Created'});
   } catch (err) {
     return res.status(500).json(err);
   }
