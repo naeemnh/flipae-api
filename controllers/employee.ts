@@ -1,4 +1,4 @@
-import { Request, Response, response } from "express";
+import { Request, Response } from "express";
 import { createEmployee, createEmployeeWithoutError, deleteEmployeeByName, findEmployeeAndSupervisor, getEmployeeTree, listEmployees, updateEmployeeSupervisor } from "../database/employee";
 
 /**
@@ -8,7 +8,8 @@ import { createEmployee, createEmployeeWithoutError, deleteEmployeeByName, findE
  */
 async function setJsonEmployeeSupervisor(req: Request, res: Response) {
   try {
-    for (const [employee, supervisor] of Object.entries(req.body)) {
+    const {employees} = req.body;
+    for (const [employee, supervisor] of Object.entries(employees)) {
       await createEmployeeWithoutError(employee, supervisor as string);
     }
   } catch (err) {

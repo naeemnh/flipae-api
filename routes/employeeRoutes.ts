@@ -12,7 +12,7 @@ router.route('/:employeeName')
   .delete(catchAsync(employees.deleteEmployee))
   .put(catchAsync(employees.updateEmployee));
 
-router.post('/json', catchAsync(employees.setJsonEmployeeSupervisor));
+router.post('/upload', catchAsync(employees.setJsonEmployeeSupervisor));
 
 router.get('/list', catchAsync(employees.getEmployeeList));
 
