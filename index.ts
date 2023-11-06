@@ -18,7 +18,7 @@ import authRoutes from './routes/authRoutes';
 // import './seed/seed';
 
 mongoose.connect(process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/myapp') // provide a default value for MONGO_URI
-.then(() => console.log('MongoDB connected...'))
+.then(() => console.log(`MongoDB Connedted to ${process.env.MONGO_URI}`))
 .catch(err => console.log(err));
 
 app.use(cors());

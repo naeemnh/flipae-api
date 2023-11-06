@@ -15,11 +15,10 @@ const params: StrategyOptions = {
 
 
 passport.use(new JWTStrategy(params, function(payload, done) {
-
   if(payload.expire <= Date.now())
     return done(new Error("TokenExpired"), false);
 
-  User.findById(payload.id)
+  return User.findById(payload.id)
     .then(user =>  user ? done(null, user) : done(new Error("UserNotFound"), false))
     .catch(err => done(err, false))
 }))

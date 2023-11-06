@@ -9,13 +9,14 @@ router.route('/')
   .get(employees.getEmployees)
   .post(passport.authenticate('jwt'), employees.newEmployee);
   
+router.route('/upload')
+  .post(passport.authenticate('jwt'), catchAsync(employees.setJsonEmployeeSupervisor));
+
+router.get('/list', catchAsync(employees.getEmployeeList));
+
 router.route('/:employeeName')
   .delete(passport.authenticate('jwt'), catchAsync(employees.deleteEmployee))
   .put(passport.authenticate('jwt'), catchAsync(employees.updateEmployee));
-
-router.post('/upload',passport.authenticate('jwt'), catchAsync(employees.setJsonEmployeeSupervisor));
-
-router.get('/list', catchAsync(employees.getEmployeeList));
 
 // router.post('/supervisor', catchAsync(employees.newSupervisor));
 
