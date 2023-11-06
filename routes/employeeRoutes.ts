@@ -1,18 +1,19 @@
 import { Router } from 'express';
 import employees from '../controllers/employee';
 import catchAsync from '../utils/catchAsync';
+import passport from 'passport';
 
 const router = Router();
 
 router.route('/')
   .get(employees.getEmployees)
-  .post(employees.newEmployee);
+  .post(passport.authenticate('jwt'), employees.newEmployee);
   
 router.route('/:employeeName')
-  .delete(catchAsync(employees.deleteEmployee))
-  .put(catchAsync(employees.updateEmployee));
+  .delete(passport.authenticate('jwt'), catchAsync(employees.deleteEmployee))
+  .put(passport.authenticate('jwt'), catchAsync(employees.updateEmployee));
 
-router.post('/upload', catchAsync(employees.setJsonEmployeeSupervisor));
+router.post('/upload',passport.authenticate('jwt'), catchAsync(employees.setJsonEmployeeSupervisor));
 
 router.get('/list', catchAsync(employees.getEmployeeList));
 
