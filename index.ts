@@ -38,8 +38,6 @@ app.use(passport.session());
 app.use('/employees', employeeRoutes);
 app.use('/auth', authRoutes);
 
-app.use(express.static(__dirname + '/public'));
-
 const port = process.env.PORT || '3001'; // set default port to 3001 if PORT environment variable is not defined
 
 app.listen(port, () => console.log(`Server running on port ${port}`));
