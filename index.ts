@@ -28,7 +28,7 @@ app.use(
   cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
     keys: [process.env.COOKIE_KEY || 'mysecretkey'],
-     // provide a default value for COOKIE_KEY
+    secure: true,
   })
 );
   
